@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env.local
+.venv
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Local development
+.env.development
+.env.local
+.env.*.local
+
+# MATLAB
+*.m~
+*.mat
+*.fig
+
+# Docker
+Dockerfile
+docker-compose.yml
+.docker/
+
+# Others
+.DS_Store
+*.bak
+*.tmp
+*.temp 
