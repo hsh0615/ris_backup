@@ -42,4 +42,15 @@ docker-compose.yml
 .DS_Store
 *.bak
 *.tmp
-*.temp 
+*.temp
+
+# New additions
+.env
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+*.log
+.DS_Store 

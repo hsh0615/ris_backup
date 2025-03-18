@@ -1,1 +1,15 @@
- 
+version: '3.8'
+
+services:
+  ris_server:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0  # 如果需要訪問串口設備
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+    restart: unless-stopped 
