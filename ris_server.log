@@ -1297,3 +1297,50 @@ FileNotFoundError: [Errno 2] No such file or directory: 'RIS_BusData/xi_200_yi_0
 2025-03-12 17:45:09,197 - utils.ris_controller - INFO - Received response: FE
 2025-03-12 17:45:09,198 - app - INFO - Response Status: 200 OK
 2025-03-12 17:45:09,198 - app - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '91'}
+2025-03-18 21:19:12,855 - waitress - INFO - Serving on http://0.0.0.0:5000
+2025-03-18 21:20:06,289 - app - INFO - Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Sec-Ch-Ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Microsoft Edge";v="134"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"Windows"', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'none', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-US,en;q=0.9'}
+2025-03-18 21:20:06,289 - app - INFO - Request URL: GET http://127.0.0.1:5000/
+2025-03-18 21:20:06,289 - app - INFO - Response Status: 200 OK
+2025-03-18 21:20:06,290 - app - INFO - Response Headers: {'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '1696'}
+2025-03-18 21:20:06,320 - app - INFO - Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Sec-Ch-Ua-Platform': '"Windows"', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'Sec-Ch-Ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Microsoft Edge";v="134"', 'Sec-Ch-Ua-Mobile': '?0', 'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'no-cors', 'Sec-Fetch-Dest': 'image', 'Referer': 'http://127.0.0.1:5000/', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-US,en;q=0.9'}
+2025-03-18 21:20:06,321 - app - INFO - Request URL: GET http://127.0.0.1:5000/favicon.ico
+2025-03-18 21:20:06,321 - app - INFO - Response Status: 404 NOT FOUND
+2025-03-18 21:20:06,322 - app - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '164'}
+2025-03-18 21:21:10,934 - app - INFO - Request Headers: {'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.43.2', 'Accept': '*/*', 'Cache-Control': 'no-cache', 'Postman-Token': '8e3fd512-2f54-41ed-9dea-781f5bab07cc', 'Host': '192.168.1.160:5000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive', 'Content-Length': '79'}
+2025-03-18 21:21:10,934 - app - INFO - Request URL: POST http://192.168.1.160:5000/set_ris
+2025-03-18 21:21:10,935 - app - INFO - Request Body: {'xr': 10, 'yr': 0, 'zr': 390, 'use_matlab': False}
+2025-03-18 21:21:10,935 - app - INFO - Processing request with parameters: {'RIS_Case': 2, 'freq': 28.0, 'xi': 10.5, 'yi': 5.2, 'zi': 2.3, 'xr': 10.0, 'yr': 0.0, 'zr': 390.0, 'theta_i': 0.0, 'phi_i': 0.0, 'theta_r': 60.0, 'phi_r': 0.0, 'bits': 8.0, 'num_px': 1.0, 'num_py': 1.0, 'fig': 3.0, 'id_panel': '01', 'com_port': 14}
+2025-03-18 21:21:10,935 - app - INFO - Using pre-calculated approach
+2025-03-18 21:21:10,936 - utils.ris_controller - INFO - Selected data file: RIS_BusData/xi_200_yi_0_zi_390_xr_0_yr_0_zr_390_hex_data.txt (distance: 10.00)
+2025-03-18 21:21:10,936 - utils.ris_controller - INFO - Sending to RIS device on COM14
+2025-03-18 21:21:10,937 - utils.ris_controller - ERROR - Error in serial communication: could not open port 'COM14': FileNotFoundError(2, '╰参тぃ﹚郎', None, 2)
+2025-03-18 21:21:10,937 - utils.ris_controller - ERROR - Error in RIS processing: could not open port 'COM14': FileNotFoundError(2, '╰参тぃ﹚郎', None, 2)
+Traceback (most recent call last):
+  File "C:\Users\mitlab\ris_control\ris_backup\utils\ris_controller.py", line 50, in process_and_send
+    self.send_via_serial(port_name, packet)
+  File "C:\Users\mitlab\ris_control\ris_backup\utils\ris_controller.py", line 134, in send_via_serial
+    ser = serial.Serial(
+  File "C:\Users\mitlab\ris_control\ris_backup\.venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "C:\Users\mitlab\ris_control\ris_backup\.venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "C:\Users\mitlab\ris_control\ris_backup\.venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM14': FileNotFoundError(2, '╰参тぃ﹚郎', None, 2)
+2025-03-18 21:21:10,938 - app - ERROR - Error processing request: could not open port 'COM14': FileNotFoundError(2, '╰参тぃ﹚郎', None, 2)
+Traceback (most recent call last):
+  File "C:\Users\mitlab\ris_control\ris_backup\app.py", line 103, in set_ris
+    result = ris_controller.process_and_send(params)
+  File "C:\Users\mitlab\ris_control\ris_backup\utils\ris_controller.py", line 50, in process_and_send
+    self.send_via_serial(port_name, packet)
+  File "C:\Users\mitlab\ris_control\ris_backup\utils\ris_controller.py", line 134, in send_via_serial
+    ser = serial.Serial(
+  File "C:\Users\mitlab\ris_control\ris_backup\.venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "C:\Users\mitlab\ris_control\ris_backup\.venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "C:\Users\mitlab\ris_control\ris_backup\.venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM14': FileNotFoundError(2, '╰参тぃ﹚郎', None, 2)
+2025-03-18 21:21:10,939 - app - INFO - Response Status: 500 INTERNAL SERVER ERROR
+2025-03-18 21:21:10,939 - app - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '228'}

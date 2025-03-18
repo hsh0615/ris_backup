@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Hsh\Desktop\RIS-20250306\RIS_API_SERVER\.venv"
+VIRTUAL_ENV="C:\Users\mitlab\ris_control\ris_backup\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

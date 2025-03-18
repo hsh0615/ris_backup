@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Hsh\Desktop\RIS-20250306\RIS_API_SERVER\.venv
+set VIRTUAL_ENV=C:\Users\mitlab\ris_control\ris_backup\.venv
 
 if not defined PROMPT set PROMPT=$P$G
 

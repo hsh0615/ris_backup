@@ -1,7 +1,8 @@
 @echo off 
+chcp 65001 > nul 
 echo. 
 echo =================================================== 
-echo                啟動RIS服務器 
+echo                 Start RIS Server 
 echo =================================================== 
 echo. 
 call .venv\Scripts\activate.bat 

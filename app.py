@@ -36,21 +36,7 @@ def log_response_info(response):
     logger.info('Response Headers: %s', dict(response.headers))
     return response
 
-# 根據配置決定是否初始化 MATLAB
-use_matlab = config['ris']['use_matlab']
-if use_matlab:
-    try:
-        from utils.matlab_interface import MatlabEngine
-        from utils.matlab_ris_controller import MatlabRISController
-        logger.info("Starting MATLAB engine...")
-        matlab_engine = MatlabEngine(config['matlab']['toolbox_path'])
-        matlab_ris_controller = MatlabRISController(matlab_engine)
-        logger.info("MATLAB engine started successfully")
-    except Exception as e:
-        logger.error(f"Failed to start MATLAB engine: {str(e)}")
-        use_matlab = False
-
-# 初始化非 MATLAB 控制器
+# 初始化RIS控制器
 from utils.ris_controller import RISController
 ris_controller = RISController()
 
@@ -100,8 +86,7 @@ def set_ris():
                 "num_py": float(data.get("num_py", config['ris']['default_params']['num_py'])),
                 "fig": float(data.get("fig", config['ris']['default_params']['fig'])),
                 "id_panel": data.get("id_panel", config['ris']['default_params']['id_panel']),
-                "com_port": int(data.get("com_port", config['ris']['default_com_port'])),
-                "use_matlab": bool(data.get("use_matlab", use_matlab))
+                "com_port": int(data.get("com_port", config['ris']['default_com_port']))
             }
         except ValueError as e:
             return jsonify({
@@ -113,13 +98,9 @@ def set_ris():
         
         logger.info(f"Processing request with parameters: {params}")
         
-        # 根據選擇使用不同的控制器
-        if params["use_matlab"] and use_matlab:
-            logger.info("Using MATLAB direct control (方案一)")
-            result = matlab_ris_controller.process_and_send(params)
-        else:
-            logger.info("Using pre-calculated approach (方案二)")
-            result = ris_controller.process_and_send(params)
+        # 使用預計算方式處理請求
+        logger.info("Using pre-calculated approach")
+        result = ris_controller.process_and_send(params)
         
         return jsonify(result)
 
@@ -135,15 +116,14 @@ def set_ris():
 @app.route('/set_ris_position', methods=['POST'])
 def set_ris_position():
     """
-    簡化版的RIS控制API端點，只需要提供接收端位置和控制方式
+    簡化版的RIS控制API端點，只需要提供接收端位置
     其他參數使用配置文件中的默認值
     
     請求格式:
     {
         "xr": 15.7,        // 接收端 X 坐標
         "yr": 8.9,         // 接收端 Y 坐標
-        "zr": 3.1,         // 接收端 Z 坐標
-        "use_matlab": true // 是否使用MATLAB直接控制（可選，默認使用配置文件中的設置）
+        "zr": 3.1         // 接收端 Z 坐標
     }
     """
     data = request.json
@@ -174,8 +154,7 @@ def set_ris_position():
                 "xr": float(data['xr']),
                 "yr": float(data['yr']),
                 "zr": float(data['zr']),
-                "com_port": config['ris']['default_com_port'],
-                "use_matlab": bool(data.get('use_matlab', config['ris']['use_matlab']))
+                "com_port": config['ris']['default_com_port']
             })
         except ValueError as e:
             return jsonify({
@@ -187,13 +166,9 @@ def set_ris_position():
 
         logger.info(f"Processing simplified request with receiver position: ({params['xr']}, {params['yr']}, {params['zr']})")
         
-        # 根據選擇使用不同的控制器
-        if params["use_matlab"]:
-            logger.info("Using MATLAB direct control (方案一)")
-            result = matlab_ris_controller.process_and_send(params)
-        else:
-            logger.info("Using pre-calculated approach (方案二)")
-            result = ris_controller.process_and_send(params)
+        # 使用預計算方式處理請求
+        logger.info("Using pre-calculated approach")
+        result = ris_controller.process_and_send(params)
         
         # 簡化返回結果
         return jsonify({
@@ -203,7 +178,7 @@ def set_ris_position():
                 "yr": params['yr'],
                 "zr": params['zr']
             },
-            "control_method": "matlab" if params['use_matlab'] else "pre_calculated"
+            "control_method": "pre_calculated"
         })
 
     except Exception as e:
@@ -222,9 +197,7 @@ def health_check():
     """
     return jsonify({
         "status": "healthy",
-        "matlab_available": use_matlab,
         "controllers": {
-            "matlab_direct": "available" if use_matlab else "unavailable",
             "pre_calculated": "available"
         }
     })
@@ -254,16 +227,10 @@ def index():
                 <div class="card">
                     <h2>Status: <span class="success">Running</span></h2>
                     <p>The RIS Control Server is operational and ready to process requests.</p>
-                    <p>Available control methods:</p>
+                    <p>Control method:</p>
                     <div class="method">
-                        <h3>方案一：MATLAB Direct Control</h3>
-                        <p>使用MATLAB即時計算和控制，適合需要即時計算的場景。</p>
-                        <p>設置參數 <code>use_matlab: true</code></p>
-                    </div>
-                    <div class="method">
-                        <h3>方案二：Pre-calculated Control</h3>
+                        <h3>Pre-calculated Control</h3>
                         <p>使用預計算方式，延遲更低，適合固定場景。</p>
-                        <p>設置參數 <code>use_matlab: false</code></p>
                     </div>
                 </div>
                 <div class="card">
@@ -274,7 +241,6 @@ def index():
 {
     "RIS_Case": 2,
     "freq": 29.4,
-    "use_matlab": true,  // 選擇控制方案
     ...
 }
                     </code></pre>
