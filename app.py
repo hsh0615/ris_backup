@@ -5,6 +5,7 @@ import time
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import HTTPException
 from config import load_config
+from utils.usbip_client import USBIPClient
 
 # 先加載配置
 config = load_config()
@@ -21,6 +22,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# 初始化 USB/IP 客戶端
+usbip_client = USBIPClient(
+    host=os.getenv('USBIP_HOST', 'host.docker.internal'),
+    port=int(os.getenv('USBIP_PORT', '3240'))
+)
 
 # 添加請求日誌中間件
 @app.before_request
@@ -39,6 +46,65 @@ def log_response_info(response):
 # 初始化RIS控制器
 from utils.ris_controller import RISController
 ris_controller = RISController()
+
+@app.route('/usbip/devices', methods=['GET'])
+def list_usb_devices():
+    """列出可用的 USB/IP 設備"""
+    devices = usbip_client.list_remote_devices()
+    return jsonify({
+        "status": "success",
+        "devices": devices
+    })
+
+@app.route('/usbip/attach', methods=['POST'])
+def attach_usb_device():
+    """連接指定的 USB/IP 設備"""
+    data = request.json
+    if not data or 'busid' not in data:
+        return jsonify({
+            "error": {
+                "code": "MISSING_BUSID",
+                "message": "缺少設備 ID (busid)"
+            }
+        }), 400
+
+    if usbip_client.attach_device(data['busid']):
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully attached device {data['busid']}"
+        })
+    else:
+        return jsonify({
+            "error": {
+                "code": "ATTACH_FAILED",
+                "message": "Failed to attach device"
+            }
+        }), 500
+
+@app.route('/usbip/detach', methods=['POST'])
+def detach_usb_device():
+    """斷開當前連接的 USB/IP 設備"""
+    if usbip_client.detach_device():
+        return jsonify({
+            "status": "success",
+            "message": "Successfully detached device"
+        })
+    else:
+        return jsonify({
+            "error": {
+                "code": "DETACH_FAILED",
+                "message": "Failed to detach device"
+            }
+        }), 500
+
+@app.route('/usbip/status', methods=['GET'])
+def get_usb_status():
+    """獲取 USB/IP 設備連接狀態"""
+    return jsonify({
+        "status": "success",
+        "is_attached": usbip_client.is_device_attached(),
+        "attached_device": usbip_client.get_attached_device()
+    })
 
 @app.route('/set_ris', methods=['POST'])
 def set_ris():
@@ -199,6 +265,10 @@ def health_check():
         "status": "healthy",
         "controllers": {
             "pre_calculated": "available"
+        },
+        "usbip": {
+            "available": True,
+            "device_attached": usbip_client.is_device_attached()
         }
     })
 

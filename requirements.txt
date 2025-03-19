@@ -6,4 +6,5 @@ requests==2.27.1
 werkzeug==2.3.8
 numpy
 matplotlib
-flask-cors 
+flask-cors
+netcat-openbsd  # For network connectivity checks 
