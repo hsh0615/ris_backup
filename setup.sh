@@ -45,15 +45,21 @@ sudo usermod -aG docker $USER
 print_info "設置串口權限..."
 sudo groupadd dialout || true
 sudo usermod -aG dialout $USER
+
+# 創建串口設備（如果不存在）
+print_info "創建串口設備..."
+sudo mknod -m 666 /dev/ttyS3 c 4 67 2>/dev/null || true
+
+# 設置串口權限
 sudo chmod 666 /dev/ttyS3 2>/dev/null || true
 
 # 創建必要的目錄
 print_info "創建必要的目錄..."
-mkdir -p config logs
+mkdir -p config logs RIS_BusData
 
 # 設置目錄權限
 print_info "設置目錄權限..."
-chmod 755 config logs
+chmod 755 config logs RIS_BusData
 
 # 停止現有服務
 print_info "停止現有服務..."

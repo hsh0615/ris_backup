@@ -11,6 +11,11 @@ RUN apt-get update && apt-get install -y \
     netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
+# Create necessary groups and add user
+RUN groupadd -r appuser && useradd -r -g appuser appuser \
+    && groupadd -r dialout || true \
+    && usermod -aG dialout appuser
+
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
@@ -21,10 +26,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p config logs
+RUN mkdir -p config logs RIS_BusData
 
 # Set permissions
-RUN chmod -R 755 /app
+RUN chown -R appuser:appuser /app \
+    && chmod -R 755 /app \
+    && chmod 666 /dev/ttyS3 2>/dev/null || true
+
+# Switch to non-root user
+USER appuser
 
 # Expose port
 EXPOSE 5000

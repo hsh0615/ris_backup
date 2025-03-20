@@ -2,19 +2,23 @@ version: '3.8'
 
 services:
   ris-server:
+    build: .
     image: ris-server:test
     container_name: ris-server
     ports:
-      - "5000:5000"  # 簡化端口映射
-    env_file:
-      - .env
+      - "5000:5000"
     volumes:
       - ./config:/app/config
       - ./logs:/app/logs
+      - ./RIS_BusData:/app/RIS_BusData
     devices:
-      - /dev/ttyS3:/dev/ttyS3  # COM4 in Linux
+      - /dev/ttyS3:/dev/ttyS3
+    privileged: true
     cap_add:
-      - SYS_ADMIN  # 添加系統權限以訪問串口
+      - SYS_ADMIN
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5000"]
       interval: 30s
