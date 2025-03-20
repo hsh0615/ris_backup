@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  ris_server:
+  ris-server:
     image: ${DOCKER_USERNAME:-your-username}/ris-server:latest
     ports:
       - "${SERVER_PORT:-5000}:5000"
@@ -10,25 +10,26 @@ services:
     volumes:
       - ./config:/app/config
       - ./logs:/app/logs
-    # Add necessary capabilities and devices
     cap_add:
-      - SYS_MODULE
       - SYS_ADMIN
     devices:
-      - /dev/bus/usb:/dev/bus/usb
-    # Use bridge network instead of host network
+      - /dev/ttyS0:/dev/ttyS0  # 映射 COM1
+      - /dev/ttyS1:/dev/ttyS1  # 映射 COM2
+      - /dev/ttyS2:/dev/ttyS2  # 映射 COM3
+      - /dev/ttyS3:/dev/ttyS3  # 映射 COM4
+      - /dev/ttyUSB0:/dev/ttyUSB0  # 映射 USB 串口
+      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/ttyUSB2:/dev/ttyUSB2
+      - /dev/ttyUSB3:/dev/ttyUSB3
     networks:
-      - ris_network
-    # Add restart policy
+      - ris-network
     restart: unless-stopped
-    # Add healthcheck
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
 
 networks:
-  ris_network:
+  ris-network:
     driver: bridge 

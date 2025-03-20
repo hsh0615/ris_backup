@@ -30,28 +30,54 @@ print_info "更新系統..."
 sudo apt-get update
 sudo apt-get upgrade -y
 
+# 安裝 Docker
+print_info "安裝 Docker..."
+# 移除舊版本
+sudo apt-get remove -y docker docker-engine docker.io containerd runc
+
 # 安裝必要的套件
-print_info "安裝必要的套件..."
 sudo apt-get install -y \
-    docker.io \
-    docker-compose \
-    linux-tools-generic \
-    linux-modules-extra-$(uname -r) \
+    apt-transport-https \
+    ca-certificates \
     curl \
-    jq
+    gnupg \
+    lsb-release
+
+# 添加 Docker 的官方 GPG 密鑰
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# 設置穩定版倉庫
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 更新套件列表
+sudo apt-get update
+
+# 安裝 Docker Engine
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# 安裝 Docker Compose
+print_info "安裝 Docker Compose..."
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
 # 將用戶添加到 docker 群組
 print_info "設置 Docker 權限..."
+sudo groupadd docker || true
 sudo usermod -aG docker $USER
 
-# 加載 USB/IP 內核模塊
-print_info "加載 USB/IP 內核模塊..."
-sudo modprobe usbip_host || true
-sudo modprobe vhci-hcd || true
+# 設置串口權限
+print_info "設置串口權限..."
+sudo groupadd dialout || true
+sudo usermod -aG dialout $USER
+sudo chmod 666 /dev/ttyS* /dev/ttyUSB* 2>/dev/null || true
 
-# 啟動 USB/IP 服務器
-print_info "啟動 USB/IP 服務器..."
-sudo usbipd -D
+# 安裝其他必要的套件
+print_info "安裝其他必要的套件..."
+sudo apt-get install -y \
+    curl \
+    jq
 
 # 創建必要的目錄
 print_info "創建必要的目錄..."
@@ -85,13 +111,9 @@ if curl -s http://localhost:5000/health > /dev/null; then
     print_info "健康狀態檢查："
     curl -s http://localhost:5000/health | jq '.'
     
-    # 列出 USB/IP 設備
-    print_info "USB/IP 設備列表："
-    curl -s http://localhost:5000/usbip/devices | jq '.'
-    
-    # 檢查 USB/IP 狀態
-    print_info "USB/IP 連接狀態："
-    curl -s http://localhost:5000/usbip/status | jq '.'
+    # 測試 RIS 控制
+    print_info "測試 RIS 控制："
+    curl -X POST -H "Content-Type: application/json" -d '{"xr": 15.7, "yr": 8.9, "zr": 3.1}' http://localhost:5000/set_ris_position | jq '.'
     
     print_info "測試完成！"
     print_info "你可以使用以下命令查看日誌："
@@ -107,4 +129,9 @@ fi
 print_info "如果你想推送到 Docker Hub，請執行："
 echo "docker login"
 echo "docker tag ris-server:test your-username/ris-server:latest"
-echo "docker push your-username/ris-server:latest" 
+echo "docker push your-username/ris-server:latest"
+
+# 提示用戶需要重新登入
+print_warn "請注意：你需要重新登入以使權限生效"
+print_warn "請執行："
+echo "newgrp docker dialout" 
