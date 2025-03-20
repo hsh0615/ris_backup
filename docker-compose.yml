@@ -12,7 +12,7 @@ services:
       - ./logs:/app/logs
       - ./RIS_BusData:/app/RIS_BusData
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
     privileged: true
     cap_add:
       - SYS_ADMIN
@@ -23,8 +23,8 @@ services:
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
-      - COM_PORT=/dev/ttyUSB0
-      - SERIAL_PORT=/dev/ttyUSB0
+      - COM_PORT=/dev/ttyUSB1
+      - SERIAL_PORT=/dev/ttyUSB1
       - TZ=Asia/Taipei
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5000"]
