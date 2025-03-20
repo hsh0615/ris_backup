@@ -108,8 +108,7 @@ class RISController:
             return {
                 "status": "success",
                 "message": "Data sent to RIS device using direct serial communication",
-                "data_file": os.path.basename(data_file),
-                "distance": min_distance
+                "data_file": os.path.basename(data_file)
             }
             
         except Exception as e:
