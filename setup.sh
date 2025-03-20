@@ -48,6 +48,7 @@ sudo usermod -aG dialout $USER
 
 # 創建串口設備（如果不存在）
 print_info "創建串口設備..."
+sudo rm -f /dev/ttyS3  # 先刪除可能存在的設備
 sudo mknod -m 666 /dev/ttyS3 c 4 67 2>/dev/null || true
 
 # 設置串口權限

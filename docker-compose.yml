@@ -17,6 +17,7 @@ services:
     cap_add:
       - SYS_ADMIN
       - SYS_RAWIO
+      - SYS_TTY_CONFIG
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production

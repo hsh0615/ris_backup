@@ -131,48 +131,66 @@ class RISController:
             if len(packet) != 810:
                 raise ValueError(f"Invalid packet size: {len(packet)} bytes (expected 810)")
             
+            # 檢查串口設備是否存在
+            if not os.path.exists(port_name):
+                raise FileNotFoundError(f"Serial port {port_name} does not exist")
+            
+            # 檢查串口權限
+            try:
+                with open(port_name, 'rb') as f:
+                    pass
+            except PermissionError:
+                raise PermissionError(f"No permission to access {port_name}")
+            
             # 打開串口連接
-            ser = serial.Serial(
-                port=port_name,
-                baudrate=28800,
-                bytesize=serial.EIGHTBITS,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
-                timeout=2,
-                write_timeout=10,
-                xonxoff=False,
-                rtscts=False,
-                dsrdtr=False
-            )
+            ser = None
+            try:
+                ser = serial.Serial(
+                    port=port_name,
+                    baudrate=28800,
+                    bytesize=serial.EIGHTBITS,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    timeout=2,
+                    write_timeout=10,
+                    xonxoff=False,
+                    rtscts=False,
+                    dsrdtr=False,
+                    exclusive=True
+                )
+                
+                # 設置串口參數
+                ser.setRTS(True)
+                ser.setDTR(True)
+                
+                # 清空緩衝區
+                ser.reset_input_buffer()
+                ser.reset_output_buffer()
+                
+                # 發送數據
+                logger.info(f"Sending {len(packet)} bytes to {port_name}")
+                ser.write(packet)
+                logger.info("Data sent. Waiting for response...")
+                
+                # 等待響應
+                time.sleep(1)
+                response_data = ser.read(ser.in_waiting)
+                
+                if response_data:
+                    response_hex = response_data.hex().upper()
+                    logger.info(f"Received response: {response_hex}")
+                else:
+                    logger.warning("No response received from RIS")
+                
+                return response_data
+                
+            finally:
+                if ser and ser.is_open:
+                    ser.close()
             
-            # 設置串口參數
-            ser.setRTS(True)
-            ser.setDTR(True)
-            
-            # 清空緩衝區
-            ser.reset_input_buffer()
-            ser.reset_output_buffer()
-            
-            # 發送數據
-            logger.info(f"Sending {len(packet)} bytes to {port_name}")
-            ser.write(packet)
-            logger.info("Data sent. Waiting for response...")
-            
-            # 等待響應
-            time.sleep(1)
-            response_data = ser.read(ser.in_waiting)
-            
-            # 關閉連接
-            ser.close()
-            
-            if response_data:
-                response_hex = response_data.hex().upper()
-                logger.info(f"Received response: {response_hex}")
-            else:
-                logger.warning("No response received from RIS")
-            
-            return response_data
-            
+        except serial.SerialException as e:
+            logger.error(f"Serial communication error: {str(e)}")
+            raise
         except Exception as e:
             logger.error(f"Error in serial communication: {str(e)}")
             raise 
