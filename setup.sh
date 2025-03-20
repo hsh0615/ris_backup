@@ -52,6 +52,7 @@ sudo mknod -m 666 /dev/ttyS3 c 4 67 2>/dev/null || true
 
 # 設置串口權限
 sudo chmod 666 /dev/ttyS3 2>/dev/null || true
+sudo chown root:dialout /dev/ttyS3 2>/dev/null || true
 
 # 創建必要的目錄
 print_info "創建必要的目錄..."

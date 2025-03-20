@@ -138,8 +138,20 @@ class RISController:
                 bytesize=serial.EIGHTBITS,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
-                timeout=2
+                timeout=2,
+                write_timeout=10,
+                xonxoff=False,
+                rtscts=False,
+                dsrdtr=False
             )
+            
+            # 設置串口參數
+            ser.setRTS(True)
+            ser.setDTR(True)
+            
+            # 清空緩衝區
+            ser.reset_input_buffer()
+            ser.reset_output_buffer()
             
             # 發送數據
             logger.info(f"Sending {len(packet)} bytes to {port_name}")
