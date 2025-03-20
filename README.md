@@ -1,118 +1,189 @@
-# RIS 控制服務器
+# RIS Control Server
 
-這是一個用於控制可重構智能表面(Reconfigurable Intelligent Surface, RIS)的API服務器。該服務器使用Python與MATLAB引擎進行通信，以控制RIS硬件。
+This is a Docker-based RIS (Reconfigurable Intelligent Surface) control server that provides a REST API for controlling RIS devices.
 
-## 系統要求
+## Prerequisites
 
-- Windows操作系統
-- Python 3.8（與MATLAB Engine API兼容）
-- MATLAB（已安裝）
-- Docker（可選，用於容器化部署）
+- Ubuntu 20.04 or later
+- Docker and Docker Compose installed
+- USB/IP support in the kernel
+- Docker Hub account (for deployment)
 
-## 項目結構
+### Installing Docker and Docker Compose
 
+```bash
+# Update package list
+sudo apt-get update
+
+# Install required packages
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+# Add Docker's official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Set up the stable repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Add your user to the docker group
+sudo usermod -aG docker $USER
+
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 ```
-RIS_API_SERVER/
-├── YTTEK_YTRS0289_release_2024_v1/    # MATLAB工具箱（已包含在專案中）
-├── utils/                              # Python工具類
-├── app.py                             # 主應用服務器
-├── config.py                          # 配置文件
-├── requirements.txt                   # Python依賴
-├── .env                              # 環境變量配置
-├── Dockerfile                        # Docker構建文件
-├── docker-compose.yml               # Docker編排文件
-└── start_ris_server.bat              # 本地啟動腳本
+
+### Setting up USB/IP
+
+```bash
+# Install USB/IP tools
+sudo apt-get install -y linux-tools-generic linux-modules-extra-$(uname -r)
+
+# Load required kernel modules
+sudo modprobe usbip_host
+sudo modprobe vhci-hcd
+
+# Start USB/IP server
+sudo usbipd -D
 ```
 
-## 快速開始
+## Deployment
 
-### 使用 Docker（推薦）
+### Building and Pushing to Docker Hub
 
-1. 確保已安裝 Docker 和 Docker Compose
+1. Create a Docker Hub account at https://hub.docker.com/
 
-2. 配置環境變量：
-   - 複製 `.env.example` 為 `.env`（如果尚未創建）
-   - 修改 `.env` 中的配置，特別是 MATLAB 路徑和串口設置
+2. Login to Docker Hub:
+```bash
+docker login
+```
 
-3. 構建和啟動容器：
-   ```bash
-   docker-compose up -d --build
-   ```
+3. Build the image:
+```bash
+# Replace your-username with your Docker Hub username
+docker build -t your-username/ris-server:latest .
+```
 
-4. 查看日誌：
-   ```bash
-   docker-compose logs -f
-   ```
+4. Push the image:
+```bash
+docker push your-username/ris-server:latest
+```
 
-5. 停止服務：
-   ```bash
-   docker-compose down
-   ```
+### Quick Start for Users
 
-### 本地運行（不使用 Docker）
+1. Create a new directory and download the configuration files:
+```bash
+mkdir ris-control && cd ris-control
+curl -O https://raw.githubusercontent.com/your-username/ris-control/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/your-username/ris-control/main/.env.example
+```
 
-1. 運行`setup_venv_py38.bat`腳本以設置Python環境：
-   ```
-   setup_venv_py38.bat
-   ```
+2. Create your environment file:
+```bash
+cp .env.example .env
+```
 
-2. 運行`start_ris_server.bat`腳本：
-   ```
-   start_ris_server.bat
-   ```
+3. Edit the `.env` file with your settings:
+```bash
+nano .env
+```
+Make sure to set:
+- `DOCKER_USERNAME`: Your Docker Hub username
+- `RIS_COM_PORT`: Your RIS device's COM port number
+- `USBIP_DEVICE_BUSID`: Your USB device's bus ID (optional)
 
-## Docker 注意事項
+4. Create necessary directories:
+```bash
+mkdir -p config logs
+```
 
-1. MATLAB 掛載：
-   - 確保 `.env` 中的 `DOCKER_MATLAB_VOLUME` 指向正確的 MATLAB 安裝路徑
-   - Windows 路徑需要使用正斜杠 `/`
+5. Start the server:
+```bash
+docker-compose up -d
+```
 
-2. 串口訪問：
-   - 容器需要特權模式訪問串口設備
-   - 確保 `.env` 中的 `DOCKER_COM_PORT_MAPPING` 設置正確
+6. Check the server status:
+```bash
+curl http://localhost:5000/health
+```
 
-3. 故障排除：
-   - 如果無法訪問串口，檢查 Docker 用戶是否在 `dialout` 組中
-   - 確保 MATLAB 許可證在容器中可用
+## API Usage
 
-## API文檔
+### List Available USB/IP Devices
+```bash
+curl http://localhost:5000/usbip/devices
+```
 
-服務器提供以下API端點：
+### Attach a USB/IP Device
+```bash
+curl -X POST http://localhost:5000/usbip/attach \
+  -H "Content-Type: application/json" \
+  -d '{"busid": "1-1"}'
+```
 
-- `GET /`: 服務器狀態頁面
-- `GET /health`: 健康檢查
-- `POST /set_ris`: 完整的RIS控制
-- `POST /set_ris_position`: 簡化版RIS控制
+### Check USB/IP Status
+```bash
+curl http://localhost:5000/usbip/status
+```
 
-## 故障排除
+### Control RIS Device
+```bash
+curl -X POST http://localhost:5000/set_ris \
+  -H "Content-Type: application/json" \
+  -d '{
+    "xr": 15.7,
+    "yr": 8.9,
+    "zr": 3.1
+  }'
+```
 
-### Docker 相關問題
+## Configuration
 
-1. MATLAB Engine API 問題：
-   - 確保 MATLAB 目錄正確掛載
-   - 檢查容器內 MATLAB 路徑權限
+The server can be configured through the `.env` file. Here are the main settings:
 
-2. 串口訪問問題：
-   - 確保 Docker 有串口訪問權限
-   - 檢查串口設備映射是否正確
+- `DOCKER_USERNAME`: Your Docker Hub username
+- `SERVER_PORT`: Port to expose the API (default: 5000)
+- `USBIP_HOST`: USB/IP server host (default: host.docker.internal)
+- `USBIP_PORT`: USB/IP server port (default: 3240)
+- `USBIP_DEVICE_BUSID`: USB device bus ID to automatically attach
+- `RIS_COM_PORT`: COM port number for the RIS device
+- `RIS_DEFAULT_PARAMS`: Default parameters for RIS control
 
-3. 容器啟動失敗：
-   - 檢查日誌：`docker-compose logs ris-api`
-   - 確認環境變量配置正確
+## Troubleshooting
 
-### 一般問題
+1. If the server fails to start, check the logs:
+```bash
+docker-compose logs -f
+```
 
-### MATLAB Engine API安裝問題
+2. If USB/IP connection fails:
+- Ensure USB/IP server is running: `sudo usbipd -D`
+- Check kernel modules are loaded: `lsmod | grep usbip`
+- Verify USB device is available: `usbip list -r localhost`
 
-如果MATLAB Engine API安裝失敗，您可以嘗試手動安裝：
+3. If you get permission errors:
+- Ensure your user is in the docker group: `groups`
+- If not, add your user: `sudo usermod -aG docker $USER`
+- Log out and back in for changes to take effect
 
-1. 打開MATLAB
-2. 在MATLAB命令窗口運行：
-   ```matlab
-   cd(fullfile(matlabroot,'extern','engines','python'))
-   system('python setup.py install')
-   ```
+## Development
 
-### Python版本兼容性
+To build the image locally:
+```bash
+docker build -t ris-server:latest .
+```
 
-MATLAB Engine API可能與某些Python版本不兼容。如果您遇到兼容性問題，請確保使用Python 3.8，這是已知與大多數MATLAB版本兼容的版本。 
+To run tests:
+```bash
+docker-compose run --rm ris_server python -m pytest
+``` 
