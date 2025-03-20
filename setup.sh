@@ -46,28 +46,29 @@ print_info "設置串口權限..."
 sudo groupadd dialout || true
 sudo usermod -aG dialout $USER
 
-# 創建串口設備（如果不存在）
-print_info "創建串口設備..."
-sudo rm -f /dev/ttyS3  # 先刪除可能存在的設備
-sudo mknod -m 666 /dev/ttyS3 c 4 67 2>/dev/null || true
-
-# 設置串口權限
-sudo chmod 666 /dev/ttyS3 2>/dev/null || true
-sudo chown root:dialout /dev/ttyS3 2>/dev/null || true
+# 設置 USB 串口設備權限
+print_info "設置 USB 串口設備權限..."
+sudo chmod 666 /dev/ttyUSB0 2>/dev/null || true
+sudo chown root:dialout /dev/ttyUSB0 2>/dev/null || true
 
 # 設置串口參數
 print_info "設置串口參數..."
-sudo stty -F /dev/ttyS3 28800 cs8 -cstopb -parenb -crtscts -ixon -ixoff -ignpar -ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke
+sudo stty -F /dev/ttyUSB0 28800 cs8 -cstopb -parenb -crtscts -ixon -ixoff -ignpar -ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke
 
 # 創建 udev 規則
 print_info "創建 udev 規則..."
 sudo tee /etc/udev/rules.d/99-serial.rules << EOF
-KERNEL=="ttyS3", GROUP="dialout", MODE="0666", SYMLINK+="ttyUSB0"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP="dialout", MODE="0666", SYMLINK+="ttyUSB0"
 EOF
 
 # 重新加載 udev 規則
 sudo udevadm control --reload-rules
 sudo udevadm trigger
+
+# 檢查串口設備
+print_info "檢查串口設備..."
+ls -l /dev/ttyUSB*
+sudo setserial -g /dev/ttyUSB0
 
 # 創建必要的目錄
 print_info "創建必要的目錄..."

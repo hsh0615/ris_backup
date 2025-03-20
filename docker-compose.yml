@@ -12,17 +12,20 @@ services:
       - ./logs:/app/logs
       - ./RIS_BusData:/app/RIS_BusData
     devices:
-      - /dev/ttyS3:/dev/ttyS3
+      - /dev/ttyUSB0:/dev/ttyUSB0
     privileged: true
     cap_add:
       - SYS_ADMIN
       - SYS_RAWIO
       - SYS_TTY_CONFIG
       - NET_ADMIN
+      - SYS_MODULE
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
-      - COM_PORT=/dev/ttyS3
+      - COM_PORT=/dev/ttyUSB0
+      - SERIAL_PORT=/dev/ttyUSB0
+      - TZ=Asia/Taipei
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5000"]
       interval: 30s

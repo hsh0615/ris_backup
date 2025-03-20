@@ -39,13 +39,8 @@ class RISController:
                 params.get("zr", 390)
             )
             
-            # 直接通過串口發送
-            com_port = params["com_port"]
-            if os.name == 'nt':
-                port_name = f'COM{com_port}'
-            else:
-                # 使用固定的串口名稱 /dev/ttyS3
-                port_name = '/dev/ttyS3'
+            # 使用環境變量中的串口設備
+            port_name = os.getenv('SERIAL_PORT', '/dev/ttyS3')
             
             logger.info(f"Sending to RIS device on {port_name}")
             self.send_via_serial(port_name, packet)
@@ -152,7 +147,8 @@ class RISController:
                     bytesize=serial.EIGHTBITS,
                     parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,
-                    timeout=1
+                    timeout=1,
+                    exclusive=False
                 )
                 
                 # 發送數據
