@@ -145,27 +145,15 @@ class RISController:
             # 打開串口連接
             ser = None
             try:
+                # 使用基本的串口配置
                 ser = serial.Serial(
                     port=port_name,
                     baudrate=28800,
                     bytesize=serial.EIGHTBITS,
                     parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,
-                    timeout=2,
-                    write_timeout=10,
-                    xonxoff=False,
-                    rtscts=False,
-                    dsrdtr=False,
-                    exclusive=True
+                    timeout=1
                 )
-                
-                # 設置串口參數
-                ser.setRTS(True)
-                ser.setDTR(True)
-                
-                # 清空緩衝區
-                ser.reset_input_buffer()
-                ser.reset_output_buffer()
                 
                 # 發送數據
                 logger.info(f"Sending {len(packet)} bytes to {port_name}")

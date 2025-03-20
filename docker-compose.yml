@@ -18,9 +18,11 @@ services:
       - SYS_ADMIN
       - SYS_RAWIO
       - SYS_TTY_CONFIG
+      - NET_ADMIN
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
+      - COM_PORT=/dev/ttyS3
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5000"]
       interval: 30s
