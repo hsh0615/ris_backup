@@ -5,7 +5,7 @@ services:
     image: ris-server:test
     container_name: ris-server
     ports:
-      - "0.0.0.0:5000:5000"  # 明確指定監聽所有接口
+      - "5000:5000"  # 簡化端口映射
     env_file:
       - .env
     volumes:
@@ -13,6 +13,8 @@ services:
       - ./logs:/app/logs
     devices:
       - /dev/ttyS3:/dev/ttyS3  # COM4 in Linux
+    cap_add:
+      - SYS_ADMIN  # 添加系統權限以訪問串口
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5000"]
       interval: 30s
