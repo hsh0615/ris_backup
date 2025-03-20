@@ -2,6 +2,8 @@ import logging
 import time
 import serial
 import os
+import re
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,41 @@ class RISController:
         """
         self.matlab_engine = None  # We don't use MATLAB engine in this implementation
     
+    def _find_closest_data_file(self, xr, yr, zr):
+        """
+        找到最接近的數據文件
+        使用歐式距離計算最接近的參數組合
+        """
+        # 獲取所有數據文件
+        data_dir = "RIS_BusData"
+        all_files = os.listdir(data_dir)
+        
+        # 解析文件名中的坐標
+        pattern = r'xi_(\d+)_yi_(\d+)_zi_(\d+)_xr_(\d+)_yr_(\d+)_zr_(\d+)_hex_data\.txt'
+        
+        min_distance = float('inf')
+        closest_file = None
+        
+        for file in all_files:
+            match = re.match(pattern, file)
+            if match:
+                # 提取文件名中的坐標
+                _, _, _, file_xr, file_yr, file_zr = map(float, match.groups())
+                
+                # 計算歐式距離
+                distance = np.sqrt((xr - file_xr)**2 + (yr - file_yr)**2 + (zr - file_zr)**2)
+                
+                # 更新最近的文件
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_file = file
+        
+        if closest_file is None:
+            raise ValueError("No valid data files found")
+        
+        logger.info(f"Selected data file: {os.path.join(data_dir, closest_file)} (distance: {min_distance:.2f})")
+        return os.path.join(data_dir, closest_file)
+
     def process_and_send(self, params):
         """
         Process parameters and send to device
@@ -39,15 +76,27 @@ class RISController:
                 params.get("zr", 390)
             )
             
+            # 使用最接近的數據文件
+            data_file = self._find_closest_data_file(
+                params.get("xr", 0),
+                params.get("yr", 0),
+                params.get("zr", 390)
+            )
+            
+            # 讀取數據文件
+            with open(data_file, 'rb') as f:
+                packet = f.read()
+            
             # 使用環境變量中的串口設備
-            port_name = os.getenv('SERIAL_PORT', '/dev/ttyS3')
+            port_name = os.getenv('SERIAL_PORT', '/dev/ttyUSB0')
             
             logger.info(f"Sending to RIS device on {port_name}")
             self.send_via_serial(port_name, packet)
             
             return {
                 "status": "success",
-                "message": "Data sent to RIS device using direct serial communication"
+                "message": "Data sent to RIS device using direct serial communication",
+                "data_file": os.path.basename(data_file)
             }
             
         except Exception as e:
