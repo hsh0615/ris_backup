@@ -29,33 +29,41 @@ class RISController:
         """
         # 獲取所有數據文件
         data_dir = "RIS_BusData"
-        all_files = os.listdir(data_dir)
+        all_files = [f for f in os.listdir(data_dir) if f.endswith('_hex_data.txt')]
         
-        # 解析文件名中的坐標
-        pattern = r'xi_(\d+)_yi_(\d+)_zi_(\d+)_xr_(\d+)_yr_(\d+)_zr_(\d+)_hex_data\.txt'
+        if not all_files:
+            raise ValueError(f"No data files found in {data_dir}")
         
         min_distance = float('inf')
         closest_file = None
         
         for file in all_files:
-            match = re.match(pattern, file)
-            if match:
-                # 提取文件名中的坐標
-                _, _, _, file_xr, file_yr, file_zr = map(float, match.groups())
+            try:
+                # 從文件名提取坐標
+                coords = file.split('_')
+                file_xr = float(coords[coords.index('xr') + 1])
+                file_yr = float(coords[coords.index('yr') + 1])
+                file_zr = float(coords[coords.index('zr') + 1])
                 
                 # 計算歐式距離
                 distance = np.sqrt((xr - file_xr)**2 + (yr - file_yr)**2 + (zr - file_zr)**2)
+                
+                logger.debug(f"File: {file}, Distance: {distance}")
                 
                 # 更新最近的文件
                 if distance < min_distance:
                     min_distance = distance
                     closest_file = file
+            except (ValueError, IndexError) as e:
+                logger.warning(f"Skipping invalid filename: {file}, Error: {e}")
+                continue
         
         if closest_file is None:
             raise ValueError("No valid data files found")
         
-        logger.info(f"Selected data file: {os.path.join(data_dir, closest_file)} (distance: {min_distance:.2f})")
-        return os.path.join(data_dir, closest_file)
+        full_path = os.path.join(data_dir, closest_file)
+        logger.info(f"Selected data file: {full_path} (distance: {min_distance:.2f})")
+        return full_path
 
     def process_and_send(self, params):
         """
@@ -68,35 +76,40 @@ class RISController:
             dict: Result of the operation
         """
         try:
-            # 準備固定的 810 bytes 數據包
-            packet = self._prepare_fixed_packet(
-                params.get("id_panel", "01"),
-                params.get("xr", 0),
-                params.get("yr", 0),
-                params.get("zr", 390)
-            )
+            xr = params.get("xr", 0)
+            yr = params.get("yr", 0)
+            zr = params.get("zr", 390)
             
-            # 使用最接近的數據文件
-            data_file = self._find_closest_data_file(
-                params.get("xr", 0),
-                params.get("yr", 0),
-                params.get("zr", 390)
-            )
+            # 找到最接近的數據文件
+            data_file = self._find_closest_data_file(xr, yr, zr)
             
-            # 讀取數據文件
+            # 讀取數據文件並驗證大小
             with open(data_file, 'rb') as f:
                 packet = f.read()
+            
+            if len(packet) != 810:
+                # 如果數據不是 810 bytes，嘗試處理文本格式
+                with open(data_file, 'r') as f:
+                    hex_data = f.read().strip()
+                    # 移除所有空白字符
+                    hex_data = ''.join(hex_data.split())
+                    # 轉換為 bytes
+                    packet = bytes.fromhex(hex_data)
+            
+            if len(packet) != 810:
+                raise ValueError(f"Invalid packet size after processing: {len(packet)} bytes (expected 810)")
             
             # 使用環境變量中的串口設備
             port_name = os.getenv('SERIAL_PORT', '/dev/ttyUSB0')
             
-            logger.info(f"Sending to RIS device on {port_name}")
+            logger.info(f"Sending {len(packet)} bytes to RIS device on {port_name}")
             self.send_via_serial(port_name, packet)
             
             return {
                 "status": "success",
                 "message": "Data sent to RIS device using direct serial communication",
-                "data_file": os.path.basename(data_file)
+                "data_file": os.path.basename(data_file),
+                "distance": min_distance
             }
             
         except Exception as e:
