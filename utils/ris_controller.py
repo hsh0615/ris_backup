@@ -44,7 +44,8 @@ class RISController:
             if os.name == 'nt':
                 port_name = f'COM{com_port}'
             else:
-                port_name = f'/dev/ttyS{com_port-1}'  # Linux-style port naming
+                # 使用固定的串口名稱 /dev/ttyS3
+                port_name = '/dev/ttyS3'
             
             logger.info(f"Sending to RIS device on {port_name}")
             self.send_via_serial(port_name, packet)
@@ -119,7 +120,7 @@ class RISController:
         Send data packet directly via serial port
         
         Args:
-            port_name (str): Full port name (e.g. 'COM14' or '/dev/ttyS13')
+            port_name (str): Full port name (e.g. 'COM14' or '/dev/ttyS3')
             packet (bytes): Data packet to send (810 bytes)
             
         Returns:
