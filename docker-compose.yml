@@ -5,7 +5,7 @@ services:
     image: ris-server:test
     container_name: ris-server
     ports:
-      - "5000:5000"  # 簡化端口映射
+      - "0.0.0.0:5000:5000"  # 明確指定監聽所有接口
     env_file:
       - .env
     volumes:
