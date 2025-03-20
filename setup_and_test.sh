@@ -87,6 +87,14 @@ mkdir -p config logs
 print_info "設置配置文件..."
 cp .env.example .env
 
+# 重新加載用戶組
+print_info "重新加載用戶組..."
+newgrp docker dialout
+
+# 等待 Docker 服務啟動
+print_info "等待 Docker 服務啟動..."
+sleep 5
+
 # 建立 Docker 鏡像
 print_info "建立 Docker 鏡像..."
 docker build -t ris-server:test .
@@ -132,6 +140,6 @@ echo "docker tag ris-server:test your-username/ris-server:latest"
 echo "docker push your-username/ris-server:latest"
 
 # 提示用戶需要重新登入
-print_warn "請注意：你需要重新登入以使權限生效"
-print_warn "請執行："
+print_warn "請注意：如果你遇到權限問題，請重新登入系統"
+print_warn "或者執行："
 echo "newgrp docker dialout" 
