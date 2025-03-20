@@ -290,7 +290,7 @@ def handle_exception(e):
 
 if __name__ == '__main__':
     port = config['server']['port']
-    host = config['server']['host']
+    host = '0.0.0.0'  # 監聽所有接口
     debug = config['server']['debug']
     
     logger.info(f"Starting RIS Server on {host}:{port} (debug={debug})")
