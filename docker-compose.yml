@@ -5,13 +5,12 @@ services:
     image: ris-server:test
     container_name: ris-server
     ports:
-      - "0.0.0.0:5000:5000"  # 明確指定監聽所有接口
+      - "5000:5000"  # 簡化端口映射
     env_file:
       - .env
     volumes:
       - ./config:/app/config
       - ./logs:/app/logs
-      - /dev/ttyS3:/dev/ttyS3  # COM4 in Linux
     devices:
       - /dev/ttyS3:/dev/ttyS3  # COM4 in Linux
     healthcheck:
