@@ -72,11 +72,11 @@ sudo setserial -g /dev/ttyUSB0
 
 # 創建必要的目錄
 print_info "創建必要的目錄..."
-mkdir -p config logs RIS_BusData
+mkdir -p config RIS_BusData
 
 # 設置目錄權限
 print_info "設置目錄權限..."
-chmod 755 config logs RIS_BusData
+chmod 755 config RIS_BusData
 
 # 停止現有服務
 print_info "停止現有服務..."
