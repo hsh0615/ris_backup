@@ -57,9 +57,7 @@ docker run -d \
   --name ris-server \
   --restart unless-stopped \
   -p 5000:5000 \
-  -v "$(pwd)/config:/app/config" \
-  -v "$(pwd)/logs:/app/logs" \
-  -v "$(pwd)/RIS_BusData:/app/RIS_BusData" \
+  -v ./ris_server.logs:/app/ris_server.logs" \
   --device=/dev/ttyUSB1:/dev/ttyUSB1 \
   --env FLASK_APP=app.py \
   --env FLASK_ENV=production \
