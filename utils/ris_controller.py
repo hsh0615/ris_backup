@@ -100,7 +100,7 @@ class RISController:
                 raise ValueError(f"Invalid packet size after processing: {len(packet)} bytes (expected 810)")
             
             # 使用環境變量中的串口設備
-            port_name = os.getenv('SERIAL_PORT', '/dev/ttyUS10')
+            port_name = os.getenv('COM_PORT', '/dev/ttyUS10')
             
             logger.info(f"Sending {len(packet)} bytes to RIS device on {port_name}")
             self.send_via_serial(port_name, packet)
