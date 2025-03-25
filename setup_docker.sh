@@ -47,17 +47,28 @@ sudo usermod -aG docker $USER
 print_info "停止現有服務..."
 docker-compose down || true
 
+# 如果 container 已經存在，強制刪除
+if [ "$(docker ps -aq -f name=ris-server)" ]; then
+    print_warn "發現已存在的 ris-server container，正在刪除..."
+    docker rm -f ris-server
+fi
 # 重新構建鏡像
 print_info "構建 Docker 鏡像..."
 docker build -t ris-server:test .
 
 # 執行 container（取代 docker-compose）
 print_info "啟動 container..."
+
+# 自動準備 log
+mkdir -p logs
+touch logs/ris_server.log
+chmod 666 logs/ris_server.log
+
 docker run -d \
   --name ris-server \
   --restart unless-stopped \
   -p 5000:5000 \
-  -v ./ris_server.log:/app/ris_server.log \
+  -v ./logs:/app/logs \
   --device=/dev/ttyUSB1:/dev/ttyUSB1 \
   --env FLASK_APP=app.py \
   --env FLASK_ENV=production \

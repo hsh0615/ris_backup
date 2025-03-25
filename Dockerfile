@@ -25,13 +25,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p config logs RIS_BusData
-
 # Set permissions
-RUN chown -R appuser:appuser /app \
-    && chmod -R 755 /app \
-    && chmod 666 /dev/ttyS3 2>/dev/null || true
+RUN mkdir -p logs \
+ && chown -R appuser:appuser /app \
+ && chmod -R 755 /app \
+ && chmod 777 /app/logs || true
 
 # Switch to non-root user
 USER appuser

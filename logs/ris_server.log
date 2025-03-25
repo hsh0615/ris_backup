@@ -1,0 +1,56 @@
+2025-03-25 15:50:23,334 - __main__ - INFO - Starting RIS Server on 0.0.0.0:5000 (debug=False)
+2025-03-25 15:50:23,336 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.17.0.2:5000
+2025-03-25 15:50:23,337 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-25 15:50:51,472 - __main__ - INFO - Starting RIS Server on 0.0.0.0:5000 (debug=False)
+2025-03-25 15:50:51,475 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.17.0.2:5000
+2025-03-25 15:50:51,475 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-25 15:51:16,514 - __main__ - INFO - Request Headers: {'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.43.2', 'Accept': '*/*', 'Cache-Control': 'no-cache', 'Postman-Token': 'fd9a0a59-158d-4bb4-8bd0-227a1d22cec3', 'Host': '192.168.1.160:5000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive', 'Content-Length': '83'}
+2025-03-25 15:51:16,515 - __main__ - INFO - Request URL: POST http://192.168.1.160:5000/set_ris
+2025-03-25 15:51:16,515 - __main__ - INFO - Request Body: {'xr': -110, 'yr': 200, 'zr': 390, 'use_matlab': False}
+2025-03-25 15:51:16,515 - __main__ - INFO - Processing request with parameters: {'RIS_Case': 2, 'freq': 28.0, 'xi': 10.5, 'yi': 5.2, 'zi': 2.3, 'xr': -110.0, 'yr': 200.0, 'zr': 390.0, 'theta_i': 0.0, 'phi_i': 0.0, 'theta_r': 60.0, 'phi_r': 0.0, 'bits': 8.0, 'num_px': 1.0, 'num_py': 1.0, 'fig': 3.0, 'id_panel': '01', 'com_port': 14}
+2025-03-25 15:51:16,515 - __main__ - INFO - Using pre-calculated approach
+2025-03-25 15:51:16,515 - utils.ris_controller - INFO - Selected data file: RIS_BusData/xi_200_yi_0_zi_390_xr_-200_yr_200_zr_390_hex_data.txt (distance: 90.00)
+2025-03-25 15:51:16,515 - utils.ris_controller - INFO - Sending 810 bytes to RIS device on /dev/ttyUSB1
+2025-03-25 15:51:16,516 - utils.ris_controller - INFO - Sending 810 bytes to /dev/ttyUSB1
+2025-03-25 15:51:16,517 - utils.ris_controller - INFO - Data sent. Waiting for response...
+2025-03-25 15:51:17,517 - utils.ris_controller - INFO - Received response: FE
+2025-03-25 15:51:17,518 - __main__ - INFO - Response Status: 200 OK
+2025-03-25 15:51:17,518 - __main__ - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '159'}
+2025-03-25 15:51:17,518 - werkzeug - INFO - 192.168.1.130 - - [25/Mar/2025 15:51:17] "POST /set_ris HTTP/1.1" 200 -
+2025-03-25 15:51:17,881 - __main__ - INFO - Request Headers: {'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.43.2', 'Accept': '*/*', 'Cache-Control': 'no-cache', 'Postman-Token': 'cb20650b-b682-4702-ae37-45d0080251ca', 'Host': '192.168.1.160:5000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive', 'Content-Length': '83'}
+2025-03-25 15:51:17,881 - __main__ - INFO - Request URL: POST http://192.168.1.160:5000/set_ris
+2025-03-25 15:51:17,882 - __main__ - INFO - Request Body: {'xr': -110, 'yr': 200, 'zr': 390, 'use_matlab': False}
+2025-03-25 15:51:17,882 - __main__ - INFO - Processing request with parameters: {'RIS_Case': 2, 'freq': 28.0, 'xi': 10.5, 'yi': 5.2, 'zi': 2.3, 'xr': -110.0, 'yr': 200.0, 'zr': 390.0, 'theta_i': 0.0, 'phi_i': 0.0, 'theta_r': 60.0, 'phi_r': 0.0, 'bits': 8.0, 'num_px': 1.0, 'num_py': 1.0, 'fig': 3.0, 'id_panel': '01', 'com_port': 14}
+2025-03-25 15:51:17,882 - __main__ - INFO - Using pre-calculated approach
+2025-03-25 15:51:17,882 - utils.ris_controller - INFO - Selected data file: RIS_BusData/xi_200_yi_0_zi_390_xr_-200_yr_200_zr_390_hex_data.txt (distance: 90.00)
+2025-03-25 15:51:17,882 - utils.ris_controller - INFO - Sending 810 bytes to RIS device on /dev/ttyUSB1
+2025-03-25 15:51:17,884 - utils.ris_controller - INFO - Sending 810 bytes to /dev/ttyUSB1
+2025-03-25 15:51:17,884 - utils.ris_controller - INFO - Data sent. Waiting for response...
+2025-03-25 15:51:18,884 - utils.ris_controller - WARNING - No response received from RIS
+2025-03-25 15:51:18,885 - __main__ - INFO - Response Status: 200 OK
+2025-03-25 15:51:18,885 - __main__ - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '159'}
+2025-03-25 15:51:18,885 - werkzeug - INFO - 192.168.1.130 - - [25/Mar/2025 15:51:18] "POST /set_ris HTTP/1.1" 200 -
+2025-03-25 15:51:57,477 - __main__ - INFO - Request Headers: {'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.43.2', 'Accept': '*/*', 'Cache-Control': 'no-cache', 'Postman-Token': 'd5f5dc04-b6e9-424b-9918-219f20b882b8', 'Host': '192.168.1.160:5000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive', 'Content-Length': '65'}
+2025-03-25 15:51:57,477 - __main__ - INFO - Request URL: POST http://192.168.1.160:5000/set_ris
+2025-03-25 15:51:57,478 - __main__ - INFO - Response Status: 400 BAD REQUEST
+2025-03-25 15:51:57,478 - __main__ - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '124'}
+2025-03-25 15:51:57,478 - werkzeug - INFO - 192.168.1.130 - - [25/Mar/2025 15:51:57] "[31m[1mPOST /set_ris HTTP/1.1[0m" 400 -
+2025-03-25 15:54:28,593 - __main__ - INFO - Request Headers: {'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.43.2', 'Accept': '*/*', 'Cache-Control': 'no-cache', 'Postman-Token': 'e0a21031-dc7e-41e8-bdf4-d61b73317eee', 'Host': '192.168.1.160:5000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive', 'Content-Length': '57'}
+2025-03-25 15:54:28,593 - __main__ - INFO - Request URL: POST http://192.168.1.160:5000/set_ris
+2025-03-25 15:54:28,593 - __main__ - INFO - Request Body: {'xr': -110, 'yr': 200, 'zr': 390}
+2025-03-25 15:54:28,594 - __main__ - INFO - Processing request with parameters: {'RIS_Case': 2, 'freq': 28.0, 'xi': 10.5, 'yi': 5.2, 'zi': 2.3, 'xr': -110.0, 'yr': 200.0, 'zr': 390.0, 'theta_i': 0.0, 'phi_i': 0.0, 'theta_r': 60.0, 'phi_r': 0.0, 'bits': 8.0, 'num_px': 1.0, 'num_py': 1.0, 'fig': 3.0, 'id_panel': '01', 'com_port': 14}
+2025-03-25 15:54:28,594 - __main__ - INFO - Using pre-calculated approach
+2025-03-25 15:54:28,594 - utils.ris_controller - INFO - Selected data file: RIS_BusData/xi_200_yi_0_zi_390_xr_-200_yr_200_zr_390_hex_data.txt (distance: 90.00)
+2025-03-25 15:54:28,594 - utils.ris_controller - INFO - Sending 810 bytes to RIS device on /dev/ttyUSB1
+2025-03-25 15:54:28,595 - utils.ris_controller - INFO - Sending 810 bytes to /dev/ttyUSB1
+2025-03-25 15:54:28,595 - utils.ris_controller - INFO - Data sent. Waiting for response...
+2025-03-25 15:54:29,596 - utils.ris_controller - INFO - Received response: FE
+2025-03-25 15:54:29,597 - __main__ - INFO - Response Status: 200 OK
+2025-03-25 15:54:29,597 - __main__ - INFO - Response Headers: {'Content-Type': 'application/json', 'Content-Length': '159'}
+2025-03-25 15:54:29,597 - werkzeug - INFO - 192.168.1.130 - - [25/Mar/2025 15:54:29] "POST /set_ris HTTP/1.1" 200 -

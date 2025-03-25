@@ -42,6 +42,6 @@ def load_config():
         },
         "logging": {
             "level": os.getenv("LOG_LEVEL", "INFO"),
-            "file": os.getenv("LOG_FILE", "ris_server.log")
+            "file": os.getenv("LOG_FILE", "logs/ris_server.log")
         }
     } 
