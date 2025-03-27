@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# === 切換到腳本所在目錄的上層 ===
+cd "$(dirname "$0")/.." || exit 1
+
 # 顏色定義
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -42,25 +45,40 @@ sudo groupadd docker || true
 sudo usermod -aG docker $USER
 
 
-# 創建必要的目錄
-print_info "創建必要的目錄..."
-mkdir -p config RIS_BusData
-
-# 設置目錄權限
-print_info "設置目錄權限..."
-chmod 755 config RIS_BusData
 
 # 停止現有服務
 print_info "停止現有服務..."
 docker-compose down || true
 
+# 如果 container 已經存在，強制刪除
+if [ "$(docker ps -aq -f name=ris-server)" ]; then
+    print_warn "發現已存在的 ris-server container，正在刪除..."
+    docker rm -f ris-server
+fi
 # 重新構建鏡像
 print_info "構建 Docker 鏡像..."
 docker build -t ris-server:test .
 
-# 啟動服務
-print_info "啟動服務..."
-docker-compose up -d
+# 執行 container（取代 docker-compose）
+print_info "啟動 container..."
+
+# 自動準備 log
+mkdir -p logs
+touch logs/ris_server.log
+chmod 666 logs/ris_server.log
+
+docker run -d \
+  --name ris-server \
+  --restart unless-stopped \
+  -p 5000:5000 \
+  -v ./logs:/app/logs \
+  --device=/dev/ttyUSB1:/dev/ttyUSB1 \
+  --env FLASK_APP=app.py \
+  --env FLASK_ENV=production \
+  --env COM_PORT=/dev/ttyUSB1 \
+  --env TZ=Asia/Taipei \
+  ris-server:test
+
 
 # 等待服務啟動
 print_info "等待服務啟動..."
@@ -70,11 +88,5 @@ sleep 5
 print_info "檢查服務狀態..."
 docker ps | grep ris-server
 
-# 檢查日誌
-print_info "檢查服務日誌..."
-docker-compose logs --tail=20
-
 print_info "設置完成！"
-print_warn "請注意：您需要重新登錄以使組權限生效"
-print_warn "您可以運行 'newgrp docker dialout' 來立即應用組權限"
 print_info "服務應該已經在 http://localhost:5000 運行" 
