@@ -72,12 +72,7 @@ curl -X POST http://localhost:5000/set_ris \
 docker logs ris-server
 ```
 
-2. If you get permission errors:
-- Ensure your user is in the docker group: `groups`
-- If not, add your user: `sudo usermod -aG docker $USER`
-- Log out and back in for changes to take effect
-
-3. If USB device is not accessible:
+2. If USB device is not accessible:
 - Check if the device is properly connected
 - Verify the COM_PORT in .env matches your device
 - Ensure you have proper permissions to access the USB device
